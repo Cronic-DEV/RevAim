@@ -1,10 +1,10 @@
- local RevLoader = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Cronic-DEV/uiloader/main/uiloader')))()
+ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Cronic-DEV/uiloader/main/uiloader')))()
 
-local Window = RevLoader:MakeWindow({
+local Window = OrionLib:MakeWindow({
     Name = "REVAIM",
     HidePremium = true,
     SaveConfig = true,
-    ConfigFolder = "RevLoaderTest"
+    ConfigFolder = "OrionLibTest"
 })
 
 local Tab = Window:MakeTab({
