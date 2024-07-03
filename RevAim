@@ -152,5 +152,4 @@ Tab:AddButton({
 })
 
 Tab:AddParagraph("CREDITS","This Script Was Made By Revenge [discord: 6rqa]")
-    end
 })
