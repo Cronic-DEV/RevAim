@@ -150,3 +150,71 @@ Tab:AddButton({
         end)
     end
 })
+
+Tab:AddButton({
+    Name = "Fake Macro (c)",
+    Callback = function()
+-- Services
+local UserInputService = game:GetService("UserInputService")
+
+-- Player Reference
+local player = game.Players.LocalPlayer
+
+-- Default Walk Speed
+local defaultWalkSpeed = 16
+local increasedWalkSpeed = 50
+
+-- State Variable to Track Speed Change
+local speedChanged = false
+local humanoidRootPart
+
+-- Function to change speed using CFrame
+local function changeSpeed(isIncreasing)
+    if humanoidRootPart then
+        if isIncreasing then
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * increasedWalkSpeed * 0.1
+        else
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * defaultWalkSpeed * 0.1
+        end
+    end
+end
+
+-- Function to handle key press
+local function onKeyPress(input, gameProcessedEvent)
+    if input.KeyCode == Enum.KeyCode.C and not gameProcessedEvent then
+        speedChanged = true
+        while speedChanged do
+            changeSpeed(true)
+            wait(0.0) -- Adjust this interval to control the speed smoothly
+        end
+    end
+end
+
+-- Function to handle key release
+local function onKeyRelease(input, gameProcessedEvent)
+    if input.KeyCode == Enum.KeyCode.C and not gameProcessedEvent then
+        speedChanged = false
+        changeSpeed(false)
+    end
+end
+
+-- Function to initialize character
+local function initializeCharacter(character)
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    -- Ensure speed is reset when the script starts
+    humanoidRootPart.CFrame = humanoidRootPart.CFrame
+
+    -- Connect input events
+    UserInputService.InputBegan:Connect(onKeyPress)
+    UserInputService.InputEnded:Connect(onKeyRelease)
+end
+
+-- Listen for character added event
+player.CharacterAdded:Connect(initializeCharacter)
+
+-- Initialize with the current character if available
+if player.Character then
+    initializeCharacter(player.Character)
+end
+})
