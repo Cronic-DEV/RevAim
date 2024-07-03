@@ -28,7 +28,7 @@ Tab:AddButton({
         getgenv().AimLockKeybind = Enum.KeyCode.Q -- Keybind for AIMLOCK (NOT SILENT AIM)
 
         -- // Dependencies
-        local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/RapperDeluxe/scripts/main/silent%20aim%20module"))()
+        local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/Cronic-DEV/lock/main/lock"))()
         Aiming.TeamCheck(false)
 
         -- // Services
