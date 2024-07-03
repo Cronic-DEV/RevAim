@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
 local Window = OrionLib:MakeWindow({
     Name = "REVAIM",
@@ -20,19 +20,24 @@ local Section = Tab:AddSection({
 Tab:AddButton({
     Name = "LOCK",
     Callback = function()
-        getgenv().SilentAim = true
-        getgenv().AimLock = true
-        getgenv().Prediction = 0.165
-        getgenv().AimLockKeybind = Enum.KeyCode.Q
+        -- Original link : https://github.com/Stefanuk12/ROBLOX/blob/master/Games/Da%20Hood/SilentAimAimLock.lua
+        -- reuploaded so it will be still alive if removed
+        getgenv().SilentAim = true -- true or false
+        getgenv().AimLock = true -- true or false
+        getgenv().Prediction = 0.165 -- Prediction of Silent Aim and AimLock
+        getgenv().AimLockKeybind = Enum.KeyCode.Q -- Keybind for AIMLOCK (NOT SILENT AIM)
 
+        -- // Dependencies
         local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/RapperDeluxe/scripts/main/silent%20aim%20module"))()
         Aiming.TeamCheck(false)
 
+        -- // Services
         local Workspace = game:GetService("Workspace")
         local Players = game:GetService("Players")
         local RunService = game:GetService("RunService")
         local UserInputService = game:GetService("UserInputService")
 
+        -- // Vars
         local LocalPlayer = Players.LocalPlayer
         local Mouse = LocalPlayer:GetMouse()
         local CurrentCamera = Workspace.CurrentCamera
@@ -41,13 +46,15 @@ Tab:AddButton({
             SilentAim = getgenv().SilentAim,
             AimLock = getgenv().AimLock,
             Prediction = getgenv().Prediction,
-            AimLockKeybind = getgenv().AimLockKeybind
+            AimLockKeybind = Enum.KeyCode.Q
         }
         getgenv().DaHoodSettings = DaHoodSettings
 
+        -- // Toggle state
         local AimLockToggled = false
         local CurrentTarget = nil
 
+        -- // Toggle function
         local function ToggleAimLock()
             AimLockToggled = not AimLockToggled
             if not AimLockToggled then
@@ -55,42 +62,60 @@ Tab:AddButton({
             end
         end
 
-        UserInputService.InputBegan:Connect(function(input, gameProcessed)
-            if not gameProcessed and input.KeyCode == DaHoodSettings.AimLockKeybind then
+        -- // Listen for key press
+        UserInputService.InputBegan:Connect(function(input)
+            if input.KeyCode == DaHoodSettings.AimLockKeybind then
                 ToggleAimLock()
             end
         end)
 
+        -- // Overwrite to account downed
         function Aiming.Check()
-            if not (Aiming.Enabled and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart) then
+            -- // Check A
+            if not (Aiming.Enabled == true and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart ~= nil) then
                 return false
             end
 
+            -- // Check if downed
             local Character = Aiming.Character(Aiming.Selected)
-            local KOd = Character:FindFirstChild("BodyEffects") and Character.BodyEffects:FindFirstChild("K.O") and Character.BodyEffects["K.O"].Value
+            local KOd = Character:WaitForChild("BodyEffects")["K.O"].Value
             local Grabbed = Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
 
-            if KOd or Grabbed then
+            -- // Check B
+            if (KOd or Grabbed) then
                 return false
             end
 
+            -- //
             return true
         end
 
+        -- // Hook
         local __index
         __index = hookmetamethod(game, "__index", function(t, k)
+            -- // Check if it trying to get our mouse's hit or target and see if we can use it
             if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.Check()) then
+                -- // Vars
                 local SelectedPart = Aiming.SelectedPart
-                if DaHoodSettings.SilentAim and (k == "Hit" or k == "Target") then
+
+                -- // Hit/Target
+                if (DaHoodSettings.SilentAim and (k == "Hit" or k == "Target")) then
+                    -- // Hit to account prediction
                     local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * DaHoodSettings.Prediction)
+
+                    -- // Return modded val
                     return (k == "Hit" and Hit or SelectedPart)
                 end
             end
+
+            -- // Return
             return __index(t, k)
         end)
 
-        RunService:BindToRenderStep("AimLock", Enum.RenderPriority.Camera.Value + 1, function()
-            if DaHoodSettings.AimLock and AimLockToggled then
+        -- // Aimlock
+        RunService:BindToRenderStep("AimLock", 0, function()
+            if (DaHoodSettings.AimLock and AimLockToggled) then
+                -- // If no current target, set it
                 if not CurrentTarget then
                     if Aiming.Check() then
                         CurrentTarget = Aiming.SelectedPart
@@ -99,7 +124,10 @@ Tab:AddButton({
                     end
                 end
 
+                -- // Hit to account prediction
                 local Hit = CurrentTarget.CFrame + (CurrentTarget.Velocity * DaHoodSettings.Prediction)
+
+                -- // Set the camera to face towards the Hit
                 CurrentCamera.CFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, Hit.Position)
             end
         end)
@@ -109,80 +137,16 @@ Tab:AddButton({
 Tab:AddButton({
     Name = "ANTI-LOCK",
     Callback = function()
-        getgenv().Sky = true
-        getgenv().SkyAmount = 90
+        getgenv().Sky = true --disable or enable the antilock
+        getgenv().SkyAmount = 90 --how far it should be
 
-        local RunService = game:GetService("RunService")
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
-
-        RunService.Heartbeat:Connect(function()
-            if getgenv().Sky then
-                local Character = LocalPlayer.Character
-                if Character and Character:FindFirstChild("HumanoidRootPart") then
-                    local HumanoidRootPart = Character.HumanoidRootPart
-                    local vel = HumanoidRootPart.Velocity
-                    HumanoidRootPart.Velocity = Vector3.new(0, getgenv().SkyAmount, 0)
-                    RunService.RenderStepped:Wait()
-                    HumanoidRootPart.Velocity = vel
-                end
+        game:GetService("RunService").Heartbeat:Connect(function()
+            if getgenv().Sky ~= false then
+                local vel = game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, getgenv().SkyAmount, 0)
+                game:GetService("RunService").RenderStepped:Wait()
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = vel
             end
         end)
-    end
-})
-
-Tab:AddButton({
-    Name = "Fake Macro (c)",
-    Callback = function()
-        local UserInputService = game:GetService("UserInputService")
-        local Players = game:GetService("Players")
-        local LocalPlayer = Players.LocalPlayer
-
-        local defaultWalkSpeed = 16
-        local increasedWalkSpeed = 50
-        local speedChanged = false
-        local humanoidRootPart
-
-        local function changeSpeed(isIncreasing)
-            if humanoidRootPart then
-                if isIncreasing then
-                    humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * increasedWalkSpeed * 0.1
-                else
-                    humanoidRootPart.CFrame = humanoidRootPart.CFrame + humanoidRootPart.CFrame.LookVector * defaultWalkSpeed * 0.1
-                end
-            end
-        end
-
-        local function onKeyPress(input, gameProcessed)
-            if not gameProcessed and input.KeyCode == Enum.KeyCode.C then
-                speedChanged = true
-                while speedChanged do
-                    changeSpeed(true)
-                    task.wait(0.1)
-                end
-            end
-        end
-
-        local function onKeyRelease(input, gameProcessed)
-            if not gameProcessed and input.KeyCode == Enum.KeyCode.C then
-                speedChanged = false
-                changeSpeed(false)
-            end
-        end
-
-        local function initializeCharacter(character)
-            humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-            humanoidRootPart.CFrame = humanoidRootPart.CFrame
-
-            UserInputService.InputBegan:Connect(onKeyPress)
-            UserInputService.InputEnded:Connect(onKeyRelease)
-        end
-
-        LocalPlayer.CharacterAdded:Connect(initializeCharacter)
-
-        if LocalPlayer.Character then
-            initializeCharacter(LocalPlayer.Character)
-        end
     end
 })
