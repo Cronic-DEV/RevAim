@@ -1,6 +1,6 @@
- local RevLoaderLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Cronic-DEV/uiloader/main/uiloader')))()
+ local RevLoader = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Cronic-DEV/uiloader/main/uiloader')))()
 
-local Window = RevLoaderLib:MakeWindow({
+local Window = RevLoader:MakeWindow({
     Name = "REVAIM",
     HidePremium = true,
     SaveConfig = true,
