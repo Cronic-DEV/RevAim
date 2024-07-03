@@ -1,14 +1,14 @@
  local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/Cronic-DEV/uiloader/main/uiloader')))()
 
 local Window = OrionLib:MakeWindow({
-    Name = "REVAIM",
+    Name = "RevAim",
     HidePremium = true,
     SaveConfig = true,
     ConfigFolder = "OrionLibTest"
 })
 
 local Tab = Window:MakeTab({
-    Name = "REV",
+    Name = "MAIN",
     Icon = "rbxassetid://18323524372",
     PremiumOnly = false
 })
@@ -150,6 +150,18 @@ Tab:AddButton({
         end)
     end
 })
+local CreditsTab = Window:MakeTab({
+    Name = "CREDITS",
+    Icon = "rbxassetid://18323645153",
+    PremiumOnly = false
+})
 
-Tab:AddParagraph("CREDITS","This Script Was Made By Revenge [discord: 6rqa]")
-end
+CreditsTab:AddParagraph("CREDITS", "This Script Was Made By Revenge [discord: 6rqa]")
+
+local CreditsTab = Window:MakeTab({
+    Name = "DISCORD",
+    Icon = "rbxassetid://18323649485",
+    PremiumOnly = false
+})
+
+CreditsTab:AddParagraph("DISCORD", "discord.gg/ (coming soon)")
