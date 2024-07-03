@@ -8,8 +8,8 @@ local Window = OrionLib:MakeWindow({
 })
 
 local Tab = Window:MakeTab({
-    Name = "MAIN",
-    Icon = "rbxassetid://4483345998",
+    Name = "REV",
+    Icon = "rbxassetid://18323524372",
     PremiumOnly = false
 })
 
@@ -148,5 +148,9 @@ Tab:AddButton({
                 game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = vel
             end
         end)
+    end
+})
+
+Tab:AddParagraph("CREDITS","This Script Was Made By Revenge [discord: 6rqa]")
     end
 })
