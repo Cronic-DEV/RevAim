@@ -156,6 +156,591 @@ local CreditsTab = Window:MakeTab({
     PremiumOnly = false
 })
 
+Tab:AddButton({
+    Name = "SILENT AIM [Q], EPS [T], MACRO [C]",
+    Callback = function()
+getgenv().Target = {
+    ["Key"] = Enum.KeyCode.Q,
+    ["CamlockPred"] = 0.127,
+    ["TargetPred"] = 0.127,
+    ["Parts"] = "HumanoidRootPart",
+    ["Smoothness"] = 0.25,
+    ["Shake"] = 0, 
+    ["JumpOffset"] = -0.17,
+    ["JumpCheck"] = false
+}
+getgenv().Memory = {
+    ["MemSpoofer"] = true,
+    ["Start"] = 1137,
+    ["End"] = 1564,
+}
+
+getgenv().KOcheck = {
+    ["KoTarget"] = true,
+    ["KoCam"] = true,
+    ["KoCheck"] = true,
+    ["Resolver"] = Enum.KeyCode.G,
+}
+
+getgenv().Spin360 = {
+    ["Enabled"] = false,
+    ["RotationSpeed"] = 2500, 
+    ["Keybind"] = Enum.KeyCode.V,
+}
+
+getgenv().FloodsCframe = {
+    ["Enabled"] = true,
+    ["Toggle"] = "C"
+}
+
+getgenv().Ware = {
+    ["Texture"] = {
+        ["Enabled"] = false,
+        ["Material"] = Enum.Material.Brick,
+        ["Color"] = Color3.fromRGB(255, 255, 255)
+    },
+    ["Options"] = {
+        ["AutoLowGfx"] = true,
+        ["MuteBoomBox"] = true
+    }
+}
+
+getgenv().Floodware = {
+    Esp = {
+        ["Enabled"] = (true), 
+        ["UseEspKeybind"] = (true),
+        ["EspKey"] = ("t"), 
+        ["HoldMode"] = (false), 
+
+        ["Name"] = {["Enabled"] = false, ["OutLine"] = true, ["Color"] = Color3.fromRGB(255, 255, 255)}, 
+        ["Box"] = {["Enabled"] = true, ["OutLine"] = true, ["Color"] = Color3.fromRGB(255, 255, 255)}, 
+        ["HealthBar"] = {["Enabled"] = true, ["OutLine"] = true, ["Color"] = Color3.fromRGB(0, 255, 0)}, 
+        ["HealthText"] = {["Enabled"] = true, ["OutLine"] = true, ["Color"] = Color3.fromRGB(0, 255, 0)}, 
+        ["Distance"] = {["Enabled"] = false, ["OutLine"] = true, ["Color"] = Color3.fromRGB(255, 255, 255)} 
+    }
+}
+
+if not LPH_OBFUSCATED then
+    LPH_JIT_MAX = function(...)
+        return (...)
+    end
+    LPH_NO_VIRTUALIZE = function(...)
+        return (...)
+    end
+end
+
+LPH_JIT_MAX(function()
+    local Floodware = getgenv().Floodware
+    local Script = {Functions = {}, EspPlayers = {}}
+
+    local Players, Client, Mouse, RS, Camera, GuiS =
+        game:GetService("Players"),
+        game:GetService("Players").LocalPlayer,
+        game:GetService("Players").LocalPlayer:GetMouse(),
+        game:GetService("RunService"),
+        game:GetService("Workspace").CurrentCamera,
+        game:GetService("GuiService")
+
+    Script.Functions.NewDrawing = function(Type, Properties)
+        local NewDrawing = Drawing.new(Type)
+        for i, v in next, Properties or {} do
+            NewDrawing[i] = v
+        end
+        return NewDrawing
+    end
+
+    Script.Functions.NewPlayer = function(Player)
+        Script.EspPlayers[Player] = {
+            Name = Script.Functions.NewDrawing("Text", {Color = Color3.fromRGB(255, 255, 255), Outline = true, Visible = false, Center = true, Size = 13, Font = 0}),
+            BoxOutline = Script.Functions.NewDrawing("Square", {Color = Color3.fromRGB(0, 0, 0), Thickness = 3, Visible = false}),
+            Box = Script.Functions.NewDrawing("Square", {Color = Color3.fromRGB(255, 255, 255), Thickness = 1, Visible = false}),
+            HealthBarOutline = Script.Functions.NewDrawing("Line", {Color = Color3.fromRGB(0, 0, 0), Thickness = 3, Visible = false}),
+            HealthBar = Script.Functions.NewDrawing("Line", {Color = Color3.fromRGB(0, 255, 0), Thickness = 1, Visible = false}),
+            HealthText = Script.Functions.NewDrawing("Text", {Color = Color3.fromRGB(0, 255, 0), Outline = true, Visible = false, Center = true, Size = 13, Font = 0}),
+            Distance = Script.Functions.NewDrawing("Text", {Color = Color3.fromRGB(255, 255, 255), Outline = true, Visible = false, Center = true, Size = 13, Font = 0})
+        }
+    end
+
+    Script.Functions.UpdateEsp = function()
+        for i, v in pairs(Script.EspPlayers) do
+            if Floodware.Esp.Enabled and i ~= Client and i.Character and i.Character:FindFirstChild("Humanoid") and i.Character:FindFirstChild("HumanoidRootPart") and i.Character:FindFirstChild("Head") then
+                local Hum = i.Character.Humanoid
+                local Hrp = i.Character.HumanoidRootPart
+
+                local Vector, OnScreen = Camera:WorldToViewportPoint(i.Character.HumanoidRootPart.Position)
+                local Size = (Camera:WorldToViewportPoint(Hrp.Position - Vector3.new(0, 3, 0)).Y - Camera:WorldToViewportPoint(Hrp.Position + Vector3.new(0, 2.6, 0)).Y) / 2
+                local BoxSize = Vector2.new(math.floor(Size * 1.5), math.floor(Size * 1.9))
+                local BoxPos = Vector2.new(math.floor(Vector.X - Size * 1.5 / 2), math.floor(Vector.Y - Size * 1.6 / 2))
+                local BottomOffset = BoxSize.Y + BoxPos.Y + 1
+
+                if OnScreen then
+                    if Floodware.Esp.Name.Enabled then
+                        v.Name.Position = Vector2.new(BoxSize.X / 2 + BoxPos.X, BoxPos.Y - 16)
+                        v.Name.Outline = Floodware.Esp.Name.OutLine
+                        v.Name.Text = tostring(i)
+                        v.Name.Color = Floodware.Esp.Name.Color
+                        v.Name.OutlineColor = Color3.fromRGB(0, 0, 0)
+                        v.Name.Font = 0
+                        v.Name.Size = 16
+
+                        v.Name.Visible = true
+                    else
+                        v.Name.Visible = false
+                    end
+                    if Floodware.Esp.Distance.Enabled and Client.Character and Client.Character:FindFirstChild("HumanoidRootPart") then
+                        v.Distance.Position = Vector2.new(BoxSize.X / 2 + BoxPos.X, BottomOffset)
+                        v.Distance.Outline = Floodware.Esp.Distance.OutLine
+                        v.Distance.Text = "[" .. math.floor((Hrp.Position - Client.Character.HumanoidRootPart.Position).Magnitude) .. "m]"
+                        v.Distance.Color = Floodware.Esp.Distance.Color
+                        v.Distance.OutlineColor = Color3.fromRGB(0, 0, 0)
+                        BottomOffset = BottomOffset + 15
+
+                        v.Distance.Font = 0
+                        v.Distance.Size = 16
+
+                        v.Distance.Visible = true
+                    else
+                        v.Distance.Visible = false
+                    end
+                    if Floodware.Esp.Box.Enabled then
+                        v.BoxOutline.Size = BoxSize
+                        v.BoxOutline.Position = BoxPos
+                        v.BoxOutline.Visible = Floodware.Esp.Box.OutLine
+                        v.BoxOutline.Color = Color3.fromRGB(0, 0, 0)
+
+                        v.Box.Size = BoxSize
+                        v.Box.Position = BoxPos
+                        v.Box.Color = Floodware.Esp.Box.Color
+                        v.Box.Visible = true
+                    else
+                        v.BoxOutline.Visible = false
+                        v.Box.Visible = false
+                    end
+                    if Floodware.Esp.HealthBar.Enabled then
+                        v.HealthBar.From = Vector2.new((BoxPos.X - 5), BoxPos.Y + BoxSize.Y)
+                        v.HealthBar.To = Vector2.new(v.HealthBar.From.X, v.HealthBar.From.Y - (Hum.Health / Hum.MaxHealth) * BoxSize.Y)
+                        v.HealthBar.Color = Floodware.Esp.HealthBar.Color
+                        v.HealthBar.Visible = true
+
+                        v.HealthBarOutline.From = Vector2.new(v.HealthBar.From.X, BoxPos.Y + BoxSize.Y + 1)
+                        v.HealthBarOutline.To = Vector2.new(v.HealthBar.From.X, (v.HealthBar.From.Y - 1 * BoxSize.Y) - 1)
+                        v.HealthBarOutline.Color = Color3.fromRGB(0, 0, 0)
+                        v.HealthBarOutline.Visible = Floodware.Esp.HealthBar.OutLine
+                    else
+                        v.HealthBarOutline.Visible = false
+                        v.HealthBar.Visible = false
+                    end
+                    if Floodware.Esp.HealthText.Enabled then
+                        v.HealthText.Text = tostring(math.floor((Hum.Health / Hum.MaxHealth) * 100 + 0.5))
+                        v.HealthText.Position = Vector2.new((BoxPos.X - 20), (BoxPos.Y + BoxSize.Y - 1 * BoxSize.Y) - 1)
+                        v.HealthText.Color = Floodware.Esp.HealthText.Color
+                        v.HealthText.OutlineColor = Color3.fromRGB(0, 0, 0)
+                        v.HealthText.Outline = Floodware.Esp.HealthText.OutLine
+
+                        v.HealthText.Font = 0
+                        v.HealthText.Size = 16
+
+                        v.HealthText.Visible = true
+                    else
+                        v.HealthText.Visible = false
+                    end
+                else
+                    v.Name.Visible = false
+                    v.BoxOutline.Visible = false
+                    v.Box.Visible = false
+                    v.HealthBarOutline.Visible = false
+                    v.HealthBar.Visible = false
+                    v.HealthText.Visible = false
+                    v.Distance.Visible = false
+                end
+            else
+                v.Name.Visible = false
+                v.BoxOutline.Visible = false
+                v.Box.Visible = false
+                v.HealthBarOutline.Visible = false
+                v.HealthBar.Visible = false
+                v.HealthText.Visible = false
+                v.Distance.Visible = false
+            end
+        end
+    end
+
+    RS.RenderStepped:Connect(function()
+        Script.Functions.UpdateEsp()
+    end)
+
+    for _, Player in ipairs(Players:GetPlayers()) do
+        Script.Functions.NewPlayer(Player)
+    end
+
+    Players.PlayerAdded:Connect(function(Player)
+        Script.Functions.NewPlayer(Player)
+    end)
+
+    Players.PlayerRemoving:Connect(function(Player)
+        if Script.EspPlayers[Player] then
+            for _, v in pairs(Script.EspPlayers[Player]) do
+                v:Remove()
+            end
+            Script.EspPlayers[Player] = nil
+        end
+    end)
+
+    Mouse.KeyDown:Connect(function(Key)
+        local Keybind = Floodware.Esp.EspKey:lower()
+        if Key == Keybind and Floodware.Esp.UseEspKeybind then
+            if Floodware.Esp.HoldMode then
+                Floodware.Esp.Enabled = true
+            else
+                Floodware.Esp.Enabled = not Floodware.Esp.Enabled
+            end
+        end
+    end)
+
+    Mouse.KeyUp:Connect(function(Key)
+        local Keybind = Floodware.Esp.EspKey:lower()
+        if Key == Keybind and Floodware.Esp.UseEspKeybind and Floodware.Esp.HoldMode then
+            Floodware.Esp.Enabled = false
+        end
+    end)
+end)()
+
+-- // Texture \ --
+
+if getgenv().Ware.Texture.Enabled then
+    for _, v in pairs(game:GetService("Workspace"):GetDescendants()) do
+        if v:IsA("BasePart") and not v.Parent:FindFirstChild("Humanoid") then
+            v.Material = getgenv().Ware.Texture.Material
+            v.Color = getgenv().Ware.Texture.Color
+            if v:IsA("Texture") then
+                v:Destroy()
+            end
+        end
+    end
+end
+
+-- // Auto low GFX \ --
+
+if getgenv().Ware.Options.AutoLowGfx then
+    for _, v in pairs(game:GetService("Workspace"):GetDescendants()) do
+        if v:IsA("BasePart") and not v.Parent:FindFirstChild("Humanoid") then
+            v.Material = Enum.Material.SmoothPlastic
+            if v:IsA("Texture") then
+                v:Destroy()
+            end
+        end
+    end
+end
+
+-- // Auto mute boom box \ --
+
+if getgenv().Ware.Options.MuteBoomBox then
+    for _, v in pairs(game:GetService("Workspace"):GetDescendants()) do
+        if v:IsA("Sound") and not (v.Name == "ShootSound" or v.Name == "NoAmmo") then
+            v.Volume = 0
+        end
+    end
+end
+
+-- // CFrame \\ --
+
+if getgenv().FloodsCframe.Enabled then
+    repeat wait() until game:IsLoaded()
+    local Players = game:GetService('Players')
+    local LocalPlayer = Players.LocalPlayer
+    repeat wait() until LocalPlayer.Character
+    local UserInputService = game:GetService('UserInputService')
+    local RunService = game:GetService('RunService')
+    getgenv().Multiplier = 0.5
+    local isActive = true
+
+    UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.LeftBracket then
+            getgenv().Multiplier = getgenv().Multiplier + 0.01
+            print(getgenv().Multiplier)
+            wait(0.2)
+            while UserInputService:IsKeyDown(Enum.KeyCode.LeftBracket) do
+                wait()
+                getgenv().Multiplier = getgenv().Multiplier + 0.01
+                print(getgenv().Multiplier)
+            end
+        elseif input.KeyCode == Enum.KeyCode.RightBracket then
+            getgenv().Multiplier = getgenv().Multiplier - 0.01
+            print(getgenv().Multiplier)
+            wait(0.2)
+            while UserInputService:IsKeyDown(Enum.KeyCode.RightBracket) do
+                wait()
+                getgenv().Multiplier = getgenv().Multiplier - 0.01
+                print(getgenv().Multiplier)
+            end
+        elseif input.KeyCode == Enum.KeyCode[getgenv().FloodsCframe.Toggle:upper()] then
+            isActive = not isActive
+            if isActive then
+                repeat
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame + LocalPlayer.Character.Humanoid.MoveDirection * getgenv().Multiplier
+                    RunService.Stepped:Wait()
+                until not isActive
+            end
+        end
+    end)
+end
+
+local userInputService = game:GetService("UserInputService")
+local isResolving = false -- Initialize isResolving
+
+userInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if input.KeyCode == KOcheck.Resolver then
+        isResolving = not isResolving
+        game:GetService("StarterGui"):SetCore("aa", {
+            Title = "Resolver",
+            Text = tostring(isResolving),
+            Duration = 0.1
+        })
+    end
+end)
+
+local function getnamecall()
+if game.PlaceId == 2788229376 or game.PlaceId == 7213786345 or game.PlaceId == 16033173781 or game.PlaceId == 15644861772 then
+        return "UpdateMousePosI" 
+    elseif game.PlaceId == 5602055394 or game.PlaceId == 7951883376 then
+        return "MousePos"
+    elseif game.PlaceId == 9825515356 then 
+        return "MousePosUpdate"
+    end
+end
+
+local namecalltype = getnamecall()
+
+function MainEventLocate()
+    for _,v in pairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
+        if v.Name == "MainEvent" then
+            return v
+        end
+    end
+end
+
+local Locking = false
+local Resolving = false
+local Players = game:GetService("Players")
+local Client = Players.LocalPlayer
+local Plr = nil -- Initialize Plr here
+
+-- 360 on bind
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local Toggle = false -- Initialize Toggle to false
+local RotationSpeed = getgenv().Spin360.RotationSpeed
+local Keybind = getgenv().Spin360.Keybind
+local LilChillBro24 = getgenv().Spin360.Enabled
+
+local function OnKeyPress(Input, GameProcessedEvent)
+    if Input.KeyCode == Keybind and not GameProcessedEvent then 
+        Toggle = not Toggle
+    elseif Input.KeyCode == getgenv().Macro.SpeedGlitchKey then
+        if getgenv().Macro.Enabled then 
+            getgenv().Macro.SpeedGlitch = not getgenv().Macro.SpeedGlitch
+            if getgenv().Macro.SpeedGlitch then
+                repeat
+                    game:GetService("RunService").Heartbeat:Wait()
+                    keypress(0x49)
+                    game:GetService("RunService").Heartbeat:Wait()
+                    keypress(0x4F)
+                    game:GetService("RunService").Heartbeat:Wait()
+                    keyrelease(0x49)
+                    game:GetService("RunService").Heartbeat:Wait()
+                    keyrelease(0x4F)
+                    game:GetService("RunService").Heartbeat:Wait()
+                until not getgenv().Macro.SpeedGlitch
+            end
+        end
+    end
+end
+
+UserInputService.InputBegan:Connect(OnKeyPress)
+
+local LastRenderTime = 0
+local FullCircleRotation = 2 * math.pi
+local TotalRotation = 0
+
+local function RotateCamera()
+    if Toggle and LilChillBro24 then -- Check if both Toggle and LilChillBro24 are true
+        local CurrentTime = tick()
+        local TimeDelta = math.min(CurrentTime - LastRenderTime, 0.01)
+        LastRenderTime = CurrentTime
+
+        local Rotation = CFrame.fromAxisAngle(Vector3.new(0, 1, 0), math.rad(RotationSpeed * TimeDelta))
+        Camera.CFrame = Camera.CFrame * Rotation
+
+        TotalRotation = TotalRotation + math.rad(RotationSpeed * TimeDelta)
+        if TotalRotation >= FullCircleRotation then
+            Toggle = false
+            TotalRotation = 0
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(RotateCamera)
+
+UserInputService.InputBegan:Connect(function(keygo, ok)
+    if (not ok) then
+        if (keygo.KeyCode == getgenv().Target.Key) then
+            Locking = not Locking
+            if Locking then
+                Plr = getClosestPlayerToCursor()
+            elseif not Locking then
+                if Plr then
+                    Plr = nil
+                end
+            end
+        elseif (keygo.KeyCode == getgenv().KOcheck.Resolver) then
+            Resolving = not Resolving
+        end
+    end
+end)
+
+function getClosestPlayerToCursor()
+    local closestDist = math.huge
+    local closestPlr = nil
+    for _, v in ipairs(Players:GetPlayers()) do
+        if v ~= Client and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+            local screenPos, cameraVisible = workspace.CurrentCamera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+            if cameraVisible then
+                local distToMouse = (Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y) - Vector2.new(screenPos.X, screenPos.Y)).Magnitude
+                if distToMouse < closestDist then
+                    closestPlr = v
+                    closestDist = distToMouse
+                end
+            end
+        end
+    end
+    return closestPlr
+end
+
+local function getVelocity(Player)
+    local Old = Player.Character.HumanoidRootPart.Position
+    wait(0.145)
+    local Current = Player.Character.HumanoidRootPart.Position
+    return (Current - Old) / 0.145
+end
+
+local function GetShakedVector3(Setting)
+    return Vector3.new(math.random(-Setting * 1e9, Setting * 1e9), math.random(-Setting * 1e9, Setting * 1e9), math.random(-Setting * 1e9, Setting * 1e9)) / 1e9;
+end
+
+local v = nil
+game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
+    if Plr ~= nil and Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") then
+        v = getVelocity(Plr) 
+    end
+end)
+
+local mainevent = game:GetService("ReplicatedStorage").MainEvent
+
+Client.Character.ChildAdded:Connect(function(child)
+    if child:IsA("Tool") and child:FindFirstChild("MaxAmmo") then
+        child.Activated:Connect(function()
+            if Plr and Plr.Character then
+                local Position = Plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall and Plr.Character[getgenv().Target.Parts].Position + Vector3.new(0, getgenv().Target.JumpOffset, 0) or Plr.Character[getgenv().Target.Parts].Position
+                if game.PlaceId == 2788229376 or game.PlaceId == 7213786345 or game.PlaceId == 16033173781 or game.PlaceId == 16158576873 then 
+                mainevent:FireServer("UpdateMousePosI", Position + ((Resolving == true and v or Plr.Character.HumanoidRootPart.Velocity) * getgenv().Target.CamlockPred)) 
+                else
+                    mainevent:FireServer("UpdateMousePos", Position + ((Resolving == true and v or Plr.Character.HumanoidRootPart.Velocity) * getgenv().Target.CamlockPred))
+                end
+            end
+        end)
+    end
+end)
+
+Client.CharacterAdded:Connect(function(character)
+    character.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") and child:FindFirstChild("MaxAmmo") then
+            child.Activated:Connect(function()
+                if Plr and Plr.Character then
+                    local Position = Plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall and Plr.Character[getgenv().Target.Parts].Position + Vector3.new(0, getgenv().Target.JumpOffset, 0) or Plr.Character[getgenv().Target.Parts].Position
+                    if game.PlaceId == 2788229376 or game.PlaceId == 7213786345 or game.PlaceId == 16033173781 or game.PlaceId == 16158576873 then
+                    mainevent:FireServer("UpdateMousePosI", Position + ((Resolving == true and v or Plr.Character.HumanoidRootPart.Velocity) * getgenv().Target.CamlockPred))
+                else
+                    mainevent:FireServer("UpdateMousePos", Position + ((Resolving == true and v or Plr.Character.HumanoidRootPart.Velocity) * getgenv().Target.CamlockPred))
+                end
+                end
+            end)
+        end
+    end)
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if Plr ~= nil then
+        local Position = Plr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall and Plr.Character[getgenv().Target.Parts].Position + Vector3.new(0, getgenv().Target.JumpOffset, 0) or Plr.Character[getgenv().Target.Parts].Position
+        local Main = CFrame.new(workspace.CurrentCamera.CFrame.p, Position + ((Resolving == true and v or Plr.Character.HumanoidRootPart.Velocity) * getgenv().Target.CamlockPred) + GetShakedVector3(getgenv().Target.Shake))
+        workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Lerp(Main, getgenv().Target.Smoothness, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
+    end
+    if getgenv().KOcheck.KoCheck == true and Plr and Plr.Character then
+        local KOd = Plr.Character:WaitForChild("BodyEffects")["K.O"].Value
+        local Grabbed = Plr.Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
+        if Plr.Character.Humanoid.Health < 1 or KOd or Grabbed then
+            if Locking == true then
+                Plr = nil
+                Locking = false
+            end
+        end
+    end
+    if getgenv().KOcheck.KoTarget == true and Plr and Plr.Character:FindFirstChild("Humanoid") then
+        if Plr.Character.Humanoid.health < 1 then
+            if Locking == true then
+                Plr = nil
+                Locking = false
+            end
+        end
+    end
+    if getgenv().KOcheck.KoCam == true and Client.Character and Client.Character:FindFirstChild("Humanoid") and Client.Character.Humanoid.health < 1 then
+        if Locking == true then
+            Plr = nil
+            Locking = false
+        end
+    end
+    if getgenv().Target.JumpCheck == true then
+        if Plr and Plr.Character and Plr.Character.Humanoid.FloorMaterial == Enum.Material.Air then
+            getgenv().AimPart = "HumanoidRootPart"
+        else
+            getgenv().AimPart = getgenv().OldAimPart
+        end
+    end
+end)
+
+if getgenv().Memory.MemSpoofer == true then
+    local Memory
+    for _, v in pairs(game.CoreGui.RobloxGui.PerformanceStats:GetChildren()) do
+        if v.Name == "PS_Button" and v.StatsMiniTextPanelClass.TitleLabel.Text == "Mem" then
+            Memory = v.StatsMiniTextPanelClass.ValueLabel
+        end
+    end
+
+    Memory:GetPropertyChangedSignal("Text"):Connect(function()
+        local Random = math.random(getgenv().Memory.Start, getgenv().Memory.End)
+        Random = Random * 1.23 
+        Memory.Text = "".. Random .." MB"
+    end)
+end
+
+print("injected")
+
+})
+
+CreditsTab:AddParagraph("INFO", "SILENT- ONLY FOR DH AND YENO HOOD")
+
+local CreditsTab = Window:MakeTab({
+    Name = "DISCORD",
+    Icon = "rbxassetid://18323649485",
+    PremiumOnly = false
+})
+
+local CreditsTab = Window:MakeTab({
+    Name = "CREDITS",
+    Icon = "rbxassetid://18323645153",
+    PremiumOnly = false
+})
+
 CreditsTab:AddParagraph("CREDITS", "This Script Was Made By Revenge [discord: 6rqa]")
 
 local CreditsTab = Window:MakeTab({
